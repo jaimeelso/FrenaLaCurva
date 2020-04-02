@@ -1,2 +1,2 @@
-# p-saucedo
-#FrenaLaCurva con DeepLearning
+# FrenaLaCurva con DeepLearning
+## Victor Rodríguez & Pablo Saucedo
