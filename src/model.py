@@ -14,22 +14,24 @@ with warnings.catch_warnings():
 def create_model():
 
     tf.keras.backend.clear_session()
+    dense_units = 15
+    lstm_units = 15
 
     # Branch for infected data
     infected_model = Sequential()
-    model.add(LSTM(units = 30, input_shape = (1,1), activation = 'relu'))
-    model.add(Dense(units = 30, activation= 'relu'))
+    infected_model.add(LSTM(units = 40, input_shape = (1,1), activation = 'relu'))
+    infected_model.add(Dense(units = 40, activation= 'relu'))
 
     # Branch for heat data
     heat_model = Sequential()
-    model.add(LSTM(units = 30, input_shape = (1,1), activation = 'relu'))
-    model.add(Dense(units = 30, activation= 'relu'))
+    heat_model.add(LSTM(units = 3, input_shape = (1,1), activation = 'softmax'))
+    heat_model.add(Dense(units = 3, activation= 'softmax'))
 
     # Merge layer
     merge_layer = concatenate([infected_model.output, heat_model.output])
-    hidden = Dense(units=(3*dense_units), activation='relu')(merge_layer)
-    output = Dense(units=output_size, activation='linear')(hidden)
-    model.add(Dense(units = 1, activation='linear'))
+    hidden = Dense(units=30, activation='relu')(merge_layer)
+    output = Dense(units=1, activation='linear')(hidden)
+
 
     model = Model(inputs=[infected_model.input, heat_model.input], outputs=output)
 
@@ -39,12 +41,16 @@ def compile_model(model):
     model.compile(loss='mean_absolute_error', optimizer='adam')
     
 def train_model(model, X_train, y_train):
-    history = model.fit(x = X_train, y = y_train, validation_split = 0.2, epochs = 200, shuffle = False)
+    history = model.fit(x = X_train, y = y_train, epochs = 100, shuffle = False)
     return history
 
 def evaluate_model(model, X_test, y_test):
     loss = model.evaluate(x = X_test, y = y_test)
     return loss
+
+def predict_model(model, X_test):
+    predictions = model.predict(x = X_test)
+    return predictions
 
 def sequential_prediction(model, initial_value, days):
     
@@ -57,5 +63,5 @@ def sequential_prediction(model, initial_value, days):
         predictions.append(model.predict(x = predictor)[0])
         i += 1
 
-    print(predictions)
+
     return predictions
