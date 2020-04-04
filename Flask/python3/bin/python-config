@@ -1,4 +1,4 @@
-#!/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/python3/bin/python
+#!/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/FrenaLaCurva/Flask/python3/bin/python
 
 import sys
 import getopt
