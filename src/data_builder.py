@@ -12,20 +12,28 @@ def split_data(values, test_size = 0.3):
 
     values = np.array(values)
     values_copy = values[1:]
-    values = values
 
-    X_train = values[:train_size]
-    X_test = values[train_size:-1]
+    if test_size == 0:
+        X_train = values[:-1]
+        X_test = []
+
+        y_train = values_copy
+        y_test = []
+
+        X_train = np.reshape(X_train,(X_train.shape[0], 1, 1))
+    else:
+        X_train = values[:train_size]
+        X_test = values[train_size:-1]
+
+        y_train = values_copy[:train_size]
+        y_test = values_copy[train_size:]
     
-    y_train = values_copy[:train_size]
-    y_test = values_copy[train_size:]
-    
-    X_train = np.reshape(X_train,(X_train.shape[0], 1, 1))
-    X_test = np.reshape(X_test, (X_test.shape[0], 1, 1))
+        X_train = np.reshape(X_train,(X_train.shape[0], 1, 1))
+        X_test = np.reshape(X_test, (X_test.shape[0], 1, 1))
     
     return X_train, X_test, y_train, y_test
 
-def read_infected_csv(name, country = True):
+def read_infected_csv(name,  poblation = 1, country = True):
     df = pd.read_csv(filepath_or_buffer = DATA_FOLDER + 'infected.csv')
 
     if country == True:
@@ -35,7 +43,10 @@ def read_infected_csv(name, country = True):
 
     dates = list(df)[4:]
 
-    simple_results = [float(selected_row[date].values[0]) for date in dates]
+    if poblation == 1:
+        simple_results = [float(selected_row[date].values[0]) for date in dates]
+    else:
+        simple_results = [round((float(selected_row[date].values[0])/poblation)*100,5) for date in dates]
 
     dates_formatted = [format_date(date = d) for d in dates]
 
