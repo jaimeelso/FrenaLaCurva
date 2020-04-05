@@ -28,7 +28,11 @@ def _deactivate(args):
 _deactivate(["nondestructive"])
 aliases["deactivate"] = _deactivate
 
+<<<<<<< HEAD
 $VIRTUAL_ENV = r"/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/python3"
+=======
+$VIRTUAL_ENV = r"/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/FrenaLaCurva/Flask/python3"
+>>>>>>> merge
 
 $_OLD_VIRTUAL_PATH = $PATH
 $PATH = $PATH[:]

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #!/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/python3/bin/python3
+=======
+#!/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/FrenaLaCurva/Flask/python3/bin/python3
+>>>>>>> merge
 # -*- coding: utf-8 -*-
 import re
 import sys

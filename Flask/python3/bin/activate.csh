@@ -10,7 +10,11 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
+<<<<<<< HEAD
 setenv VIRTUAL_ENV "/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/python3"
+=======
+setenv VIRTUAL_ENV "/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/FrenaLaCurva/Flask/python3"
+>>>>>>> merge
 
 set _OLD_VIRTUAL_PATH="$PATH:q"
 setenv PATH "$VIRTUAL_ENV:q/bin:$PATH:q"

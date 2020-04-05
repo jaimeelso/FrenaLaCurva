@@ -57,7 +57,11 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
+<<<<<<< HEAD
 set -gx VIRTUAL_ENV "/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/python3"
+=======
+set -gx VIRTUAL_ENV "/home/cxb0334/Documentos/Proyectos/Hackaton_Madrid/Covid_map/FrenaLaCurva/Flask/python3"
+>>>>>>> merge
 
 # https://github.com/fish-shell/fish-shell/issues/436 altered PATH handling
 if test (echo $FISH_VERSION | tr "." "\n")[1] -lt 3
