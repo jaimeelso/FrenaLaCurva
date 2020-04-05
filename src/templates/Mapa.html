@@ -153,33 +153,90 @@
                 // mapTypeId: 'satellite'
 
             });
+
             map.addListener('click', function(e) {
+                geocodeLatLng(geocoder, map, infowindow, e);
+            });
+            var geocoder = new google.maps.Geocoder;
+            var infowindow = new google.maps.InfoWindow;
 
 
-                console.log("latitud: " + e.latLng.lat() + " Longitud: " + e.latLng.lng())
-
-
-                var localizacion = {
-                    "latitud": e.latLng.lat(),
-                    "longitud": e.latLng.lng()
+            function geocodeLatLng(geocoder, map, infowindow, e) {
+                var input = e.latLng.lat() + "," + e.latLng.lng();
+                var latlngStr = input.split(',', 2);
+                var latlng = {
+                    lat: parseFloat(latlngStr[0]),
+                    lng: parseFloat(latlngStr[1])
                 };
-                var asJSON = JSON.stringify(localizacion);
-                $.ajax({
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: asJSON,
-                    dataType: 'json',
-                    url: '/givemelocation',
-                    success: function(e) {
-                        console.log(e);
-                        window.location = "/mapa";
-                    },
-                    error: function(error) {
-                        console.log(error);
+                geocoder.geocode({
+                    'location': latlng
+                }, function(results, status) {
+                    if (status === 'OK') {
+                        if (results[0]) {
+                            var localizacion = {
+                                "latitud": e.latLng.lat(),
+                                "longitud": e.latLng.lng()
+                            };
+                            var asJSON = JSON.stringify(localizacion);
+                            $.ajax({
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: asJSON,
+                                dataType: 'json',
+                                url: '/givemelocation',
+                                success: function(e) {
+                                    // console.log(e);
+                                    window.location = "/mapa";
+                                },
+                                error: function(error) {
+                                    console.log("error...");
+                                    console.log(error);
+                                }
+                            });
+
+
+
+
+                        } else {
+                            window.alert('No results found');
+                        }
+                    } else {
+                        window.alert('Geocoder failed due to: ' + status);
                     }
                 });
+            }
 
-            });
+
+
+            // map.addListener('click', function(e) {
+
+
+            //     console.log("latitud: " + e.latLng.lat() + " Longitud: " + e.latLng.lng())
+            //     console.log(e.latLng.lat() + "," + e.latLng.lng())
+
+
+
+            // var localizacion = {
+            //     "latitud": e.latLng.lat(),
+            //     "longitud": e.latLng.lng()
+            // };
+            // var asJSON = JSON.stringify(localizacion);
+            // $.ajax({
+            //     type: 'POST',
+            //     contentType: 'application/json',
+            //     data: asJSON,
+            //     dataType: 'json',
+            //     url: '/givemelocation',
+            //     success: function(e) {
+            //         console.log(e);
+            //         window.location = "/mapa";
+            //     },
+            //     error: function(error) {
+            //         console.log(error);
+            //     }
+            // });
+
+            // });
             let Objetos = Array();
             var latidudes;
             var longitudes;
@@ -249,7 +306,7 @@
                         Objetos.push(new google.maps.LatLng(parseFloat(latidudes), parseFloat(longitudes)));
 
                     }
-                    console.log(Objetos)
+                    // console.log(Objetos)
 
                 })
             })

@@ -63,7 +63,7 @@ def get_stations(provincia):
 def temperature_data(name):
     r, station_code = get_stations(provincia = name.upper())
 
-    api_key = api_key = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYWJsbzE2Mjk4QGhvdG1haWwuY29tIiwianRpIjoiZWY3MTZmYTUtZjdjNy00MmY0LWI0ZDEtN2RmOTAyMzA5M2FlIiwiaXNzIjoiQUVNRVQiLCJpYXQiOjE1ODU1NjA3MDUsInVzZXJJZCI6ImVmNzE2ZmE1LWY3YzctNDJmNC1iNGQxLTdkZjkwMjMwOTNhZSIsInJvbGUiOiIifQ.Zn3YOUpHQYrcf4woFBZP0vgzSmxJjlDRFqu9rQfNxwI"
+    api_key =  config['aemet']['api_key']
     base_url = 'https://opendata.aemet.es/opendata/api/valores/climatologicos/diarios/datos/fechaini/2020-01-01T00%3A00%3A00UTC/fechafin/2020-04-03T00%3A00%3A00UTC/estacion/{}'.format(station_code)
 
     params = {
@@ -89,7 +89,7 @@ def temperature_data(name):
     return results, simple_results
 
 def get_stations(provincia):
-    api_key = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYWJsbzE2Mjk4QGhvdG1haWwuY29tIiwianRpIjoiZWY3MTZmYTUtZjdjNy00MmY0LWI0ZDEtN2RmOTAyMzA5M2FlIiwiaXNzIjoiQUVNRVQiLCJpYXQiOjE1ODU1NjA3MDUsInVzZXJJZCI6ImVmNzE2ZmE1LWY3YzctNDJmNC1iNGQxLTdkZjkwMjMwOTNhZSIsInJvbGUiOiIifQ.Zn3YOUpHQYrcf4woFBZP0vgzSmxJjlDRFqu9rQfNxwI"
+    api_key = config['aemet']['api_key']
     base_url = 'https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/todasestaciones'
 
     params = {
@@ -131,3 +131,69 @@ def read_weather_csv(filename):
 
     return results, simple_results
 
+# obtencion de array de temperaturas de los proximos 7 dias 
+def getProvincia (lat,lon):
+
+    base_urlprovince = 'https://maps.googleapis.com/maps/api/geocode/json'
+    paramsprovince = { 
+        'latlng':str(lat)+','+str(lon),
+        'key': config['google']['api_key']                 
+    }
+    headersprovince = {
+        'cache-control': "no-cache"
+    }
+    responseprovince = requests.request('GET', base_urlprovince, params=paramsprovince, headers=headersprovince)
+    respuesta = responseprovince.json() 
+    provincia = ""
+    for dataprovince in respuesta['results']: 
+        provincia = dataprovince['address_components'][len(dataprovince)-3 ]['long_name']
+        comunidad = dataprovince['address_components'][len(dataprovince)-2]['long_name']
+        comunidadformateada = formalizarCCAA(comunidad)
+        break
+
+    return provincia
+def getArrayTemp(provincia):   
+    
+    api_key = config['weatherbit']['api_key']
+    base_url = 'https://api.weatherbit.io/v2.0/forecast/daily' 
+
+    
+    params = { 
+        'city':provincia,
+        'country':'es',
+        'days':'7',
+        'key':api_key
+    }
+
+
+    headers = {
+        'cache-control': "no-cache"
+    }
+
+    response = requests.request('GET', base_url, params=params, headers=headers)
+    forecast = response.json()   
+    tempArray = []
+    for data in forecast['data']:
+        tempArray.append(data['temp'])
+
+    return tempArray
+
+#funcion para formalizar las cadenas de las comunidades autonomas.
+def formalizarCCAA(comunidad):
+    comunidades = ["Andalucía","Aragón","Asturias","Baleares","Canarias","Cantabria","Castilla-La Mancha","Castilla y León","Cataluña","Ceuta","C. Valenciana","Extremadura","Galicia","Madrid","Melilla","Murcia","Navarra","País Vasco","La Rioja"]
+    tamanio = len(comunidades)    
+    range(0,len(comunidades))  
+    encontrado = False
+    for x in range(0,len(comunidades)):
+        if comunidad in comunidades[x]:
+            if comunidad in "Comunidad Valenciana":
+                comunidadformateada = "C. Valenciana"
+            else:
+                comunidadformateada =  comunidades[x] 
+            
+            encontrado = True
+        else: 
+            if encontrado  == False :
+                comunidadformateada  = "empty"
+        
+    return comunidadformateada

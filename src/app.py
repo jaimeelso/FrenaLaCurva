@@ -51,47 +51,12 @@ def Longitudes():
 @app.route('/givemelocation',methods=['POST'])
 def Getlocation(): 
    
-    localizacion = request.json
-    #print("la localizacion es la siguiente "+str(localizacion))
-    api_key = "13322246a8ad4613a0ca2608f8942168"
-    base_url = 'https://api.weatherbit.io/v2.0/forecast/daily'                
+    localizacion = request.json           
     lat = localizacion['latitud']
     lon = localizacion['longitud']
-
-    base_urlprovince = 'https://maps.googleapis.com/maps/api/geocode/json'
-    paramsprovince = { 
-        'latlng':str(lat)+','+str(lon),
-        'key':'AIzaSyAK5rkIpH-otp0e2JMOqZ-t7D8Z1vRKkYw'                 
-    }
-    headersprovince = {
-        'cache-control': "no-cache"
-    }
-    responseprovince = requests.request('GET', base_urlprovince, params=paramsprovince, headers=headersprovince)
-    respuesta = responseprovince.json() 
-    for dataprovince in respuesta['results']: 
-        provincia = dataprovince['address_components'][len(dataprovince)-3 ]['long_name']
-        comunidad = dataprovince['address_components'][len(dataprovince)-2]['long_name']
-
-        break
-
-    params = { 
-        'city':provincia,
-        'country':'es',
-        'days':'7',
-        'key':api_key
-    }
-
-
-    headers = {
-        'cache-control': "no-cache"
-    }
-
-    response = requests.request('GET', base_url, params=params, headers=headers)
-    forecast = response.json()   
-    tempArray = []
-    for data in forecast['data']:
-        tempArray.append(data['temp'])
-
+                          
+    provincia = getProvincia(lat,lon)
+    tempArray = getArrayTemp(provincia)
     training_window = int(config['training_window']['value'])
 
     # Datos de temperatura de la CCAA
@@ -120,6 +85,8 @@ def Getlocation():
 
     return 'ok'
     
+
+
 
 if __name__ == '__main__':    
 
