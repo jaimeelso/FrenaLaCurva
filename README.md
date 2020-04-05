@@ -4,7 +4,7 @@
 ![logo](https://github.com/p-saucedo/FrenaLaCurva/blob/master/logo.jpg)
 
 ### Propósito del proyecto
-FrenaLaCurva es un proyecto desarrollado por Victor Rodríguez y Pablo Saucedo. Ambos estamos actualmente becados con el programa Talentum de Teléfonica y somos orgullosos miembros del equipo de Ideas Locas, un equipo multidisciplinar que se basa en dos pilares de investigación: ciberseguridad e inteligencia artificial. 
+FrenaLaCurva es un proyecto desarrollado por Victor Rodríguez y Pablo Saucedo. Ambos estamos actualmente becados con el programa Talentum de Teléfonica y somos orgullosos miembros del equipo de Ideas Locas, un equipo multidisciplinar que se basa en dos focos principales de investigación: ciberseguridad e inteligencia artificial. 
 
 Debido a la grave pandemia en la que nos vemos inmersos de manera global, la Comunidad de Madrid ha organizado un hackaton llamado [VenceAlVirus](https://vencealvirus.org/) los días 4 y 5 de abril de 2020 con el objetivo de buscar soluciones a todos los problemas que se están planteado por la crisis del CoVid-19. FrenaLaCurva es nuestra aportación y también se puede encontrar en [Taiga](https://taiga.vencealvirus.software.imdea.org/project/psaucedo-frenalacurva-con-deeplearning/timeline).
 
