@@ -36,5 +36,12 @@ El proceso que vamos a llevar a cabo con el modelo es un entrenamiento con los d
 La complejidad en este modelo reside en que la curva es una función no estacionaria, por lo que va a ser necesario evitar completamente el *overfitting* para conseguir que no tienda hacia los datos ya conocidos lo que le hara incapaz de particularizar para cada caso concreto. Pero claro, por otro lado es importante que el modelo aprenda el patrón de las curvas ya que por ahora todos los datos de contagios en España siguen una tendencia creciente y, por tanto, si no aprendiese la forma de la curva de los países de entrenamiento, tendería a un crecimiento ilimitado ya que no existe dato que indique lo contrario. 
 
 
+### Flask
+Es el Grueso de la aplicación, sobre este se monta todo el proyecto para visualizar los diferentes datos.El modelo de deeplearning se genera al cargar la pestaña de mapa, la cuál nos muestra el mapa a través de la API de Google maps. Una vez se carga la base del modelo, cuando el usuario haga click sobre el mapa, hará una petición a la API de Weatherbit para obtener la predicción de las temperaturas de los próximos 7 días. 
+
+### TO DO
+Se pretende visulalizar los datos obtenidos por el modelo de deeplearning en otra vista en vez de por consola. 
+Generar un mapa de calor sobre las posibles zonas de alto riesgo en función de las predicciones.
+
 
 
