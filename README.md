@@ -40,8 +40,10 @@ La complejidad en este modelo reside en que la curva es una función no estacion
 Es el Grueso de la aplicación, sobre este se monta todo el proyecto para visualizar los diferentes datos.El modelo de deeplearning se genera al cargar la pestaña de mapa, la cuál nos muestra el mapa a través de la API de Google maps. Una vez se carga la base del modelo, cuando el usuario haga click sobre el mapa, hará una petición a la API de Weatherbit para obtener la predicción de las temperaturas de los próximos 7 días. 
 
 ### TO DO
-Se pretende visulalizar los datos obtenidos por el modelo de deeplearning en otra vista en vez de por consola. 
-Generar un mapa de calor sobre las posibles zonas de alto riesgo en función de las predicciones.
-
+* Se pretende visualizar los datos obtenidos por el modelo de deeplearning en otra vista en vez de por consola. 
+* Generar un mapa de calor sobre las posibles zonas de alto riesgo en función de las predicciones.
+* Análisis del factor de la humedad, conjuntamente con la temperatura.
+* Mejorar el modelo, ya que no ha sido capaz de generar buenas predicciones.
+* Utilizar para otros lugares geográficos, donde podremos entrenar al modelo con temperaturas más drásticas.
 
 
