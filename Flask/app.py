@@ -42,28 +42,9 @@ def Getlocation():
     localizacion = request.json
     print("la localizacion es la siguiente "+str(localizacion))
     api_key = "13322246a8ad4613a0ca2608f8942168"
-    base_url = 'https://api.weatherbit.io/v2.0/forecast/daily'
+    base_url = 'https://api.weatherbit.io/v2.0/forecast/daily'                
     lat = localizacion['latitud']
     lon = localizacion['longitud']
-
-    params = {            
-        'lat':lat,
-        'lon':lon,
-        'days':'7',
-        'lang':'es',
-        'key':api_key
-    }
-    headers = {
-        'cache-control': "no-cache"
-    }
-
-    response = requests.request('GET', base_url, params=params, headers=headers)
-    forecast = response.json()   
-    tempArray = []
-    for data in forecast['data']:
-        tempArray.append(data['temp'])             
-        
-    print(tempArray)
 
     base_urlprovince = 'https://maps.googleapis.com/maps/api/geocode/json'
     paramsprovince = { 
@@ -76,10 +57,42 @@ def Getlocation():
     responseprovince = requests.request('GET', base_urlprovince, params=paramsprovince, headers=headersprovince)
     respuesta = responseprovince.json()   
     for dataprovince in respuesta['results']:
-        provincia = dataprovince['address_components'][3]['long_name']
+        provincia = dataprovince['address_components'][2]['long_name']
+        comunidad = dataprovince['address_components'][3]['long_name']
         break
 
-    print (provincia)
+    print ("provincia: "+provincia)
+    print ("Comunidad autónoma: " + comunidad)
+
+    # params = {            
+    #     'lat':lat,
+    #     'lon':lon,
+    #     'days':'7',
+    #     'lang':'es',
+    #     'key':api_key
+    # }
+
+    params = { 
+        'city':provincia,
+        'country':'es',
+        'days':'7',
+        'key':api_key
+    }
+
+
+    headers = {
+        'cache-control': "no-cache"
+    }
+
+    response = requests.request('GET', base_url, params=params, headers=headers)
+    forecast = response.json()   
+    tempArray = []
+    for data in forecast['data']:
+        tempArray.append(data['temp'])             
+        
+    print(tempArray)
+
+
     return 'ok'
     
 

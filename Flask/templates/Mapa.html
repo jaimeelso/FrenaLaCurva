@@ -60,13 +60,17 @@
 
 
     <!-- Game section -->
-    <div id="floating-panel">
-        <button onclick="toggleHeatmap()">Toggle Heatmap</button>
-        <button onclick="changeGradient()">Change gradient</button>
-        <button onclick="changeRadius()">Change radius</button>
-        <button onclick="changeOpacity()">Change opacity</button>
-    </div>
-    <div id="map"></div>
+    <!-- <div class="row m-md-3" id="floating-panel"> -->
+
+    <body>
+        <div id="floating-panel">
+            <button onclick="toggleHeatmap()">Toggle Heatmap</button>
+            <button onclick="changeGradient()">Change gradient</button>
+            <button onclick="changeRadius()">Change radius</button>
+            <button onclick="changeOpacity()">Change opacity</button>
+        </div>
+        <div id="map"></div>
+    </body>
     <!-- Game section end -->
 
 
@@ -141,7 +145,7 @@
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 13,
+                zoom: 6,
                 center: {
                     lat: 40.537,
                     lng: -3.638
@@ -175,41 +179,25 @@
                     }
                 });
 
-
-
-
-
-
-
-
-
-
-                let Objetos = Array();
-                var latidudes;
-                var longitudes;
-                fetch('/longitudes').then(function(response) {
-                    response.json().then(function(data) {
-                        for (let value of data) {
-                            latidudes = value.Latitud;
-                            longitudes = value.Longitud;
-                            Objetos.push(new google.maps.LatLng(parseFloat(latidudes), parseFloat(longitudes)));
-
-                        }
-
-                    })
-                })
-
-
-
-
-
-
-
             });
+            let Objetos = Array();
+            var latidudes;
+            var longitudes;
+            fetch('/longitudes').then(function(response) {
+                response.json().then(function(data) {
+                    for (let value of data) {
+                        latidudes = value.Latitud;
+                        longitudes = value.Longitud;
+                        Objetos.push(new google.maps.LatLng(parseFloat(latidudes), parseFloat(longitudes)));
 
+                    }
+                })
+            })
 
+            heatData = []
+            heatData = Objetos;
             heatmap = new google.maps.visualization.HeatmapLayer({
-                data: getPoints(),
+                data: heatData,
                 map: map
             });
         }
@@ -248,7 +236,6 @@
 
         // Heatmap data: 500 Points
 
-
         function getPoints() {
 
             let Objetos = Array();
@@ -262,12 +249,12 @@
                         Objetos.push(new google.maps.LatLng(parseFloat(latidudes), parseFloat(longitudes)));
 
                     }
+                    console.log(Objetos)
 
                 })
             })
 
 
-            return Objetos
         }
 
 
