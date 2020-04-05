@@ -30,23 +30,23 @@ def mapa():
 def mapa_simple(): 
     return render_template("mapa_simple.html" )
 
-@app.route('/longitudes',methods=['GET', 'POST'])
-def Longitudes():
+# @app.route('/longitudes',methods=['GET', 'POST'])
+# def Longitudes():
   
-    puntosArray = []
-    # Using readlines() 
-    file1 = open('Longitudes.txt', 'r') 
-    Lines = file1.readlines()  
-    # Strips the newline character 
-    for line in Lines:          
-        line = line.rstrip('\n')
-        puntoObj = {}        
-        latitud = "40.537685"
-        longitud = str(line)
-        puntoObj['Latitud'] = latitud
-        puntoObj['Longitud'] = longitud    
-        puntosArray.append(puntoObj)  
-    return jsonify(puntosArray)
+#     puntosArray = []
+#     # Using readlines() 
+#     file1 = open('Longitudes.txt', 'r') 
+#     Lines = file1.readlines()  
+#     # Strips the newline character 
+#     for line in Lines:          
+#         line = line.rstrip('\n')
+#         puntoObj = {}        
+#         latitud = "40.537685"
+#         longitud = str(line)
+#         puntoObj['Latitud'] = latitud
+#         puntoObj['Longitud'] = longitud    
+#         puntosArray.append(puntoObj)  
+#     return jsonify(puntosArray)
 
 @app.route('/Datos',methods=['GET', 'POST'])
 def showData(): 

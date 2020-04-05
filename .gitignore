@@ -1,2 +1,4 @@
 Flask
 config.ini
+.vscode
+__pycache__
