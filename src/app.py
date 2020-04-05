@@ -48,6 +48,11 @@ def Longitudes():
         puntosArray.append(puntoObj)  
     return jsonify(puntosArray)
 
+@app.route('/Datos',methods=['GET', 'POST'])
+def showData(): 
+    print ("predicciones aqui...")
+    return render_template("Datos.html" )
+
 @app.route('/givemelocation',methods=['POST'])
 def Getlocation(): 
    
@@ -82,8 +87,9 @@ def Getlocation():
 
     # Esto es lo que devuelve el modelo
     print(predictions)
-
-    return 'ok'
+    respuesta = {'success':True} 
+    return json.dumps( respuesta), 200, {'ContentType':'application/json'}  
+    # return redirect("/datos", predicciones = predictions)
     
 
 

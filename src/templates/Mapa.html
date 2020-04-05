@@ -44,6 +44,9 @@
             <li class="nav-item mx-0 mx-lg-1">
                 <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/mapa">Mapa</a>
             </li>
+            <li class="nav-item mx-0 mx-lg-1">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/mapa_simple">Mapa simple </a>
+            </li>
         </ul>
     </header>
     <!-- Masthead -->
@@ -185,11 +188,30 @@
                                 dataType: 'json',
                                 url: '/givemelocation',
                                 success: function(e) {
-                                    // console.log(e);
-                                    window.location = "/mapa";
+                                    // si funciona hacemos una peticion a otra pagina con lso datos a mostrar
+                                    console.log("exito")
+                                    console.log(e);
+                                    $.ajax({
+                                        type: 'POST',
+                                        contentType: 'application/json',
+                                        data: asJSON,
+                                        dataType: 'json',
+                                        url: '/Datos',
+                                        success: function(e) {
+                                            console.log("exito 2.0")
+                                            console.log(e);
+                                        },
+                                        error: function(error) {
+                                            console.log("error 2.0")
+                                            console.log(error);
+                                        }
+                                    });
+
+
+
                                 },
                                 error: function(error) {
-                                    console.log("error...");
+                                    console.log("error...")
                                     console.log(error);
                                 }
                             });
