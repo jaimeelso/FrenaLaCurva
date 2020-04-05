@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from weather import *
 from data_builder import *
+import configparser
 import warnings
 with warnings.catch_warnings():  
     warnings.filterwarnings("ignore",category=FutureWarning)
@@ -10,21 +11,24 @@ with warnings.catch_warnings():
     from keras.layers import Dense, Input, LSTM, Add, Embedding, Flatten, SimpleRNN
     from keras.layers.core import Dropout
     from keras.layers.merge import concatenate
-    from keras.models import Model
+    from keras.models import Model, Sequential,model_from_json
     from keras.layers import Concatenate
-    from keras.models import Sequential
     from keras import regularizers
+    from sklearn.externals.joblib import dump, load
+
+config = configparser.ConfigParser()
+config.read("../config.ini")
 
 DATA_FOLDER =  os.path.dirname(os.getcwd()) + '/data/'
 MODEL_FOLDER =  os.path.dirname(os.getcwd()) + '/model/'
 
 def create_model(training_window = 1):
 
-    tf.keras.backend.clear_session()
+    #tf.keras.backend.clear_session()
 
     # Branch for infected data
     infected_model = Sequential()
-    infected_model.add(LSTM(units = 5, input_shape = (training_window,1), activation = 'relu'))
+    infected_model.add(LSTM(units = 10, input_shape = (training_window,1), activation = 'relu'))
     infected_model.add(Dropout(0.1))
     infected_model.add(Dense(units = 10, activation= 'relu'))
 
@@ -49,7 +53,7 @@ def compile_model(model):
     model.compile(loss='mean_absolute_error', optimizer='adam')
     
 def train_model(model, X_train, y_train, epochs = 150):
-    history = model.fit(x = X_train, y = y_train, epochs = epochs, shuffle = False)
+    history = model.fit(x = X_train, y = y_train, epochs = epochs, shuffle = False, verbose = 0)
     return history
 
 def evaluate_model(model, X_test, y_test):
@@ -60,12 +64,14 @@ def predict_model(model, X_test):
     predictions = model.predict(x = X_test)
     return predictions
 
-def sequential_prediction(model, initial_value, heat_initial_value, scaler, training_window, weather_forecast = None):
-    weather_forecast = np.array([15.7, 12.5, 14.1, 13.2, 14.6, 14.5, 16.1])
-
+def sequential_prediction(model, initial_value, heat_initial_value, training_window, weather_forecast):
     a = np.reshape(initial_value, (1,training_window))
     b = easy_window(data = weather_forecast, training_window = training_window)
     b = np.reshape(b,(len(b),training_window))
+    weather_scaler = load(MODEL_FOLDER + '/weather_scaler.bin')
+
+    b = weather_scaler.transform(b)
+
     weather_forecast = np.concatenate([a,b])
 
     predictions = [pred for pred in initial_value]
@@ -88,7 +94,7 @@ def sequential_prediction(model, initial_value, heat_initial_value, scaler, trai
 def easy_window(data, training_window):
     period, new_data = [], []
     i = 0
-    for inicio in range(len(data[:-training_window + 1])):
+    for inicio in range(len(data) - training_window + 1):
         for i in range(training_window):
             period.append(data[inicio+i])
 
@@ -101,8 +107,7 @@ def easy_window(data, training_window):
 # Esta funcion entrena el modelo con los datos de China y Corea. Ese modelo es guardado para ser entrenado con los datos de la
 # comunidad autónoma
 
-def create_and_train_model():
-    training_window = 3
+def create_and_train_model(training_window):
     test_size = 0.0
 
     # Cogemos datos de tiempo
@@ -129,6 +134,10 @@ def create_and_train_model():
     simple_values_weather = infected_scaler.transform(simple_values_weather.reshape(-1,1))
     simple_values_weather_kr = infected_scaler.transform(simple_values_weather_kr.reshape(-1,1))
 
+    # Guardamos scalers
+    dump(infected_scaler, MODEL_FOLDER + '/infected_scaler.bin', compress=True)
+    dump(weather_scaler, MODEL_FOLDER + '/weather_scaler.bin', compress=True)
+
     # Separamos datos tiempo
     X_train_weather, X_test_weather, y_train_weather, y_test_weather = split_data(values= simple_values_weather, test_size = test_size, training_window=training_window)
     X_train_weather_kr, X_test_weather_kr, y_train_weather_kr, y_test_weather_kr = split_data(values= simple_values_weather_kr, test_size = test_size, training_window=training_window)
@@ -139,7 +148,7 @@ def create_and_train_model():
 
     # Creamos modelo
     model = create_model(training_window=training_window)
-    print(model.summary())
+    #print(model.summary())
 
     # Compilamos modelo
     compile_model(model=model)
@@ -149,5 +158,42 @@ def create_and_train_model():
     train_model(model=model, X_train=[X_train_infected, X_train_weather], y_train=y_train_infected, epochs = 100)
 
     # Guardamos modelo
-    model_path = MODEL_FOLDER + '/model.h5'
-    model.save(model_path)
+    model_weights_path = MODEL_FOLDER + '/model.h5'
+    model.save_weights(model_weights_path)
+
+    model_arch_path = MODEL_FOLDER + '/model_arch.json'
+    with open(model_arch_path, 'w+') as f:
+        f.write(model.to_json())
+        f.close()
+
+def load_and_retrain_model(weather_data, infected_data, training_window):
+
+    test_size = 0.0
+
+    # Cargamos modelo
+    model_arch_path = MODEL_FOLDER + '/model_arch.json'
+    with open(model_arch_path, 'r') as f:
+        model = model_from_json(f.read())
+
+    model_weights_path = MODEL_FOLDER + '/model.h5'
+    model.load_weights(model_weights_path)
+
+    compile_model(model=model)
+
+    infected_scaler = load(MODEL_FOLDER + '/infected_scaler.bin')
+    weather_scaler = load(MODEL_FOLDER + '/weather_scaler.bin')
+
+    infected_data = infected_scaler.transform(infected_data.reshape(-1,1))
+    weather_data = weather_scaler.transform(weather_data.reshape(-1,1))
+
+    X_train_infected_spain, _ , y_train_infected_spain, _ = split_data(values= infected_data, test_size=test_size, training_window=training_window)
+    X_train_weather_spain, _ , _, _ = split_data(values= weather_data, test_size=test_size, training_window=training_window)
+
+   
+    train_model(model=model, X_train=[X_train_infected_spain, X_train_weather_spain], y_train=y_train_infected_spain, epochs = 50)
+    
+    return model, y_train_infected_spain[-training_window:], X_train_weather_spain[-1,:,:]
+
+def get_infected_scaler():
+    infected_scaler = load(MODEL_FOLDER + '/infected_scaler.bin')
+    return infected_scaler
