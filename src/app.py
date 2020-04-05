@@ -2,13 +2,16 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify, c
 import json
 import requests
 import numpy as np
+from weather import *
+from model import *
 from flask_bootstrap import Bootstrap
 app = Flask(__name__)
 
 Bootstrap(app)
 
 @app.route('/',methods=['GET', 'POST'])
-def index():    
+def index():
+    create_and_train_model()
     return render_template("index.html")
 
 @app.route('/mapa',methods=['GET', 'POST'])
@@ -18,6 +21,7 @@ def mapa():
 @app.route('/mapa_simple',methods=['GET', 'POST'])
 def mapa_simple(): 
     return render_template("mapa_simple.html" )
+
 @app.route('/longitudes',methods=['GET', 'POST'])
 def Longitudes():
   
@@ -40,7 +44,7 @@ def Longitudes():
 def Getlocation(): 
    
     localizacion = request.json
-    print("la localizacion es la siguiente "+str(localizacion))
+    #print("la localizacion es la siguiente "+str(localizacion))
     api_key = "13322246a8ad4613a0ca2608f8942168"
     base_url = 'https://api.weatherbit.io/v2.0/forecast/daily'                
     lat = localizacion['latitud']
@@ -61,8 +65,8 @@ def Getlocation():
         comunidad = dataprovince['address_components'][3]['long_name']
         break
 
-    print ("provincia: "+provincia)
-    print ("Comunidad autónoma: " + comunidad)
+    #print ("provincia: "+provincia)
+    #print ("Comunidad autónoma: " + comunidad)
 
     # params = {            
     #     'lat':lat,
@@ -90,8 +94,8 @@ def Getlocation():
     for data in forecast['data']:
         tempArray.append(data['temp'])             
         
-    print(tempArray)
-    print(temperature_data(provincia))
+    forecast_temperature = tempArray
+    temp_provincia, simple_temp_provincia = temperature_data(provincia)
 
 
 
@@ -105,7 +109,7 @@ def Getlocation():
 
 
   
-def temperature_data(name):
+"""def temperature_data(name):
     r, station_code = get_stations(provincia = name.upper())
 
     api_key = api_key = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYWJsbzE2Mjk4QGhvdG1haWwuY29tIiwianRpIjoiZWY3MTZmYTUtZjdjNy00MmY0LWI0ZDEtN2RmOTAyMzA5M2FlIiwiaXNzIjoiQUVNRVQiLCJpYXQiOjE1ODU1NjA3MDUsInVzZXJJZCI6ImVmNzE2ZmE1LWY3YzctNDJmNC1iNGQxLTdkZjkwMjMwOTNhZSIsInJvbGUiOiIifQ.Zn3YOUpHQYrcf4woFBZP0vgzSmxJjlDRFqu9rQfNxwI"
@@ -119,8 +123,8 @@ def temperature_data(name):
     }
 
     response = requests.request('GET', base_url, params=params, headers=headers)
-    print("respuesta datos provincia")
-    print(response)
+    #print("respuesta datos provincia")
+    #print(response)
     response_url = response.json()['datos']
 
     data = requests.request('GET', response_url)
@@ -145,22 +149,22 @@ def get_stations(provincia):
     }
 
     response = requests.request('GET', base_url, params=params, headers=headers)
-    print("imprimiendo respuesta estaciones provincia")
-    print(response)
+    #print("imprimiendo respuesta estaciones provincia")
+    #print(response)
     response_url = response.json()['datos']
 
     data = requests.request('GET', response_url)
 
-    print("imprimiendo data")
-    print(data)
+    #print("imprimiendo data")
+    #print(data)
     results = [result for result in data.json() if result['provincia'] == provincia]
     
-    return results, results[0]['indicativo']
+    return results, results[0]['indicativo']"""
 
     
 
 
 if __name__ == '__main__':    
 
-    app.run(host="10.10.200.1", port=5000,debug=True)
+    app.run(host="localhost", port=5000,debug=True, threaded=True)
     

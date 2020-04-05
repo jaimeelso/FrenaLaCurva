@@ -1,6 +1,8 @@
 import numpy as np
-import warnings
 from sklearn.preprocessing import StandardScaler
+from weather import *
+from data_builder import *
+import warnings
 with warnings.catch_warnings():  
     warnings.filterwarnings("ignore",category=FutureWarning)
     import tensorflow as tf
@@ -13,6 +15,8 @@ with warnings.catch_warnings():
     from keras.models import Sequential
     from keras import regularizers
 
+DATA_FOLDER =  os.path.dirname(os.getcwd()) + '/data/'
+MODEL_FOLDER =  os.path.dirname(os.getcwd()) + '/model/'
 
 def create_model(training_window = 1):
 
@@ -93,3 +97,57 @@ def easy_window(data, training_window):
         period = []
 
     return np.array(new_data)
+
+# Esta funcion entrena el modelo con los datos de China y Corea. Ese modelo es guardado para ser entrenado con los datos de la
+# comunidad autónoma
+
+def create_and_train_model():
+    training_window = 3
+    test_size = 0.0
+
+    # Cogemos datos de tiempo
+    values_weather, simple_values_weather = read_weather_csv(filename = 'wuhan.csv')
+    values_weather_kr, simple_values_weather_kr = read_weather_csv(filename = 'korea.csv')
+
+    # Cogemos datos de infectados
+    values_infected, simple_values_infected = read_infected_csv(name='Hubei', country=False)
+    values_infected_kr, simple_values_infected_kr = read_infected_csv(name='Korea, South', country=True)
+
+    # Balanceamos datos
+    values_weather, values_infected, simple_values_weather, simple_values_infected = balance_data(values_weather, values_infected)
+    values_weather_kr, values_infected_kr, simple_values_weather_kr, simple_values_infected_kr = balance_data(values_weather_kr, values_infected_kr)
+
+    # Escalamos datos de infectados
+    infected_scaler = StandardScaler()
+    infected_scaler.fit(simple_values_infected_kr.reshape(-1,1))
+    simple_values_infected = infected_scaler.transform(simple_values_infected.reshape(-1,1))
+    simple_values_infected_kr = infected_scaler.transform(simple_values_infected_kr.reshape(-1,1))
+
+    # Escalamos datos de temperature
+    weather_scaler = StandardScaler()
+    weather_scaler.fit(simple_values_weather_kr.reshape(-1,1))
+    simple_values_weather = infected_scaler.transform(simple_values_weather.reshape(-1,1))
+    simple_values_weather_kr = infected_scaler.transform(simple_values_weather_kr.reshape(-1,1))
+
+    # Separamos datos tiempo
+    X_train_weather, X_test_weather, y_train_weather, y_test_weather = split_data(values= simple_values_weather, test_size = test_size, training_window=training_window)
+    X_train_weather_kr, X_test_weather_kr, y_train_weather_kr, y_test_weather_kr = split_data(values= simple_values_weather_kr, test_size = test_size, training_window=training_window)
+
+    # Separamos datos de infectados
+    X_train_infected, X_test_infected, y_train_infected, y_test_infected = split_data(values= simple_values_infected, test_size=test_size, training_window=training_window)
+    X_train_infected_kr, X_test_infected_kr, y_train_infected_kr, y_test_infected_kr = split_data(values= simple_values_infected_kr, test_size=test_size, training_window=training_window)
+
+    # Creamos modelo
+    model = create_model(training_window=training_window)
+    print(model.summary())
+
+    # Compilamos modelo
+    compile_model(model=model)
+
+    # Entrenamiento
+    train_model(model=model, X_train=[X_train_infected_kr, X_train_weather_kr], y_train=y_train_infected_kr, epochs = 100)
+    train_model(model=model, X_train=[X_train_infected, X_train_weather], y_train=y_train_infected, epochs = 100)
+
+    # Guardamos modelo
+    model_path = MODEL_FOLDER + '/model.h5'
+    model.save(model_path)
