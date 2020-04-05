@@ -8,20 +8,29 @@ import sys
 config = configparser.ConfigParser()
 config.read("../config.ini")
 DATA_FOLDER = DATA_FOLDER =  os.path.dirname(os.getcwd()) + '/data/'
-def main(argv): 
-   forecastindays(argv)
+def main(argv1,argv2): 
+   forecastindays(argv1,argv2)
 
-def forecastindays(zipcode):
+def forecastindays(lat,long):
     api_key = "13322246a8ad4613a0ca2608f8942168"
     base_url = 'https://api.weatherbit.io/v2.0/forecast/daily'
-    zipcode = zipcode
+    lat = lat
+    lon = long
 
     params = {
-        'postal_code': zipcode,
-        'country': 'ES',
+        # 'postal_code': zipcode,
+        # 'country': 'ES',
+        # 'days':'7',
+        # 'lang':'es',
+        # 'key':api_key               
+        'lat':lat,
+        'lon':lon,
         'days':'7',
         'lang':'es',
-        'key':api_key                
+        'key':api_key
+
+
+
     }
     headers = {
         'cache-control': "no-cache"
@@ -124,4 +133,4 @@ def read_weather_csv(filename):
     return results, simple_results
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main(sys.argv[1:],sys.argv[2:])

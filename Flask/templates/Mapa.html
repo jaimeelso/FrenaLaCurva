@@ -146,8 +146,67 @@
                     lat: 40.537,
                     lng: -3.638
                 },
-                mapTypeId: 'satellite'
+                // mapTypeId: 'satellite'
+
             });
+            map.addListener('click', function(e) {
+
+
+                console.log("latitud: " + e.latLng.lat() + " Longitud: " + e.latLng.lng())
+
+
+                var localizacion = {
+                    "latitud": e.latLng.lat(),
+                    "longitud": e.latLng.lng()
+                };
+                var asJSON = JSON.stringify(localizacion);
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: asJSON,
+                    dataType: 'json',
+                    url: '/givemelocation',
+                    success: function(e) {
+                        console.log(e);
+                        window.location = "/mapa";
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+
+
+
+
+
+
+
+
+
+
+                let Objetos = Array();
+                var latidudes;
+                var longitudes;
+                fetch('/longitudes').then(function(response) {
+                    response.json().then(function(data) {
+                        for (let value of data) {
+                            latidudes = value.Latitud;
+                            longitudes = value.Longitud;
+                            Objetos.push(new google.maps.LatLng(parseFloat(latidudes), parseFloat(longitudes)));
+
+                        }
+
+                    })
+                })
+
+
+
+
+
+
+
+            });
+
 
             heatmap = new google.maps.visualization.HeatmapLayer({
                 data: getPoints(),
@@ -209,6 +268,15 @@
 
 
             return Objetos
+        }
+
+
+        function placeMarkerAndPanTo(latLng, map) {
+            var marker = new google.maps.Marker({
+                position: latLng,
+                map: map
+            });
+            map.panTo(latLng);
         }
     </script>
 
